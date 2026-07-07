@@ -1,0 +1,630 @@
+<style>
+  :root{
+    --ink:#1c2024;
+    --paper:#f7f6f3;
+    --panel:#ffffff;
+    --line:#e2dfd8;
+    --accent:#7a5c8a;
+    --accent-bg:#f1eaf4;
+    --op:#3d5a6c;
+    --op-bg:#eaf0f2;
+    --mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  .app{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    max-width:740px;
+    margin:0 auto;
+    padding:28px 24px 60px;
+  }
+  .header{margin-bottom:18px;}
+  .header h1{
+    font-size:19px;
+    font-weight:680;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .header p{
+    font-size:13px;
+    color:#7d7669;
+    margin:0;
+    line-height:1.5;
+  }
+
+  .tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:18px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:0;
+  }
+  .tab{
+    font-family:var(--sans);
+    font-size:13px;
+    font-weight:600;
+    padding:9px 14px;
+    border:none;
+    background:transparent;
+    color:#8a8477;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+  }
+  .tab.active{
+    color:var(--ink);
+    border-bottom-color:var(--accent);
+  }
+  .tab.active[data-mode="op"]{border-bottom-color:var(--op);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:18px;
+  }
+
+  .field-label{
+    font-size:11px;
+    font-weight:650;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:#8a8477;
+    margin-bottom:6px;
+    display:block;
+  }
+  .field-hint{
+    font-size:11px;
+    color:#a39d8e;
+    margin-top:4px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .grid .span2{grid-column:1 / -1;}
+  .grid3{
+    display:grid;
+    grid-template-columns:1fr 1fr 2fr;
+    gap:14px;
+  }
+
+  select, input[type=text]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:13.5px;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+  }
+  select:focus, input:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+  .op-mode select:focus, .op-mode input:focus{
+    border-color:var(--op);
+  }
+
+  .field{margin-bottom:0;}
+
+  .preview-box{
+    margin-top:20px;
+    padding:16px;
+    background:var(--accent-bg);
+    border:1px solid var(--accent);
+    border-radius:8px;
+  }
+  .preview-box.op{
+    background:var(--op-bg);
+    border-color:var(--op);
+  }
+  .preview-label{
+    font-size:10.5px;
+    font-weight:650;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .preview-box.op .preview-label{color:var(--op);}
+  .preview-name{
+    font-family:var(--mono);
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    word-break:break-word;
+    line-height:1.4;
+  }
+  .preview-invalid{
+    color:#a13f22;
+    font-size:12px;
+    font-family:var(--sans);
+    margin-top:6px;
+  }
+
+  .btn-row{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .btn{
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    padding:9px 14px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .btn:hover{background:#efece5;}
+  .btn.primary{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+  .btn.primary:hover{background:#000;}
+  .msg{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#5c7a5e;
+  }
+
+  .history-card h2{
+    font-size:12px;
+    font-weight:650;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:#8a8477;
+    margin:0 0 12px;
+  }
+  .history-empty{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#a39d8e;
+  }
+  .history-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-name{
+    font-family:var(--mono);
+    font-size:13px;
+    word-break:break-word;
+  }
+  .history-badge{
+    font-family:var(--sans);
+    font-size:9.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:2px 6px;
+    border-radius:4px;
+    margin-right:8px;
+    background:var(--accent-bg);
+    color:var(--accent);
+  }
+  .history-badge.op{background:var(--op-bg);color:var(--op);}
+  .history-actions{display:flex;gap:4px;flex-shrink:0;}
+  .icon-btn{
+    width:26px;height:26px;
+    border:none;
+    background:transparent;
+    border-radius:5px;
+    cursor:pointer;
+    color:#9a9486;
+    font-size:13px;
+  }
+  .icon-btn:hover{background:#efece5;color:var(--ink);}
+
+  .ref-card details{margin-bottom:10px;}
+  .ref-card summary{
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    padding:6px 0;
+    color:var(--ink);
+  }
+  .ref-card summary:hover{color:var(--accent);}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    margin-top:8px;
+  }
+  table th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:#8a8477;
+    padding:6px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  table td{
+    padding:7px 8px;
+    border-bottom:1px solid #eeece6;
+    vertical-align:top;
+  }
+  table td.mono{font-family:var(--mono);font-size:12px;}
+
+  .footer-note{
+    font-size:11.5px;
+    color:#a39d8e;
+    text-align:center;
+    margin-top:24px;
+    line-height:1.6;
+  }
+
+  @media (max-width:480px){
+    .grid, .grid3{grid-template-columns:1fr;}
+    .app{padding:20px 14px 40px;}
+    .tabs{flex-wrap:wrap;}
+  }
+</style>
+
+<div class="app">
+  <div class="header">
+    <h1>Marketing Ops Naming Generator</h1>
+    <p>Build compliant names for campaigns and operational programs — pick a tab below.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-mode="campaign" onclick="switchTab('campaign')">Campaign</button>
+    <button class="tab" data-mode="op" onclick="switchTab('opProgram')">Operational Program</button>
+    <button class="tab" data-mode="op" onclick="switchTab('opCampaign')">Operational Smart Campaign</button>
+  </div>
+
+  <!-- ===================== CAMPAIGN PANEL ===================== -->
+  <div class="panel active" id="panel-campaign">
+    <div class="card">
+      <div class="grid">
+        <div class="field">
+          <label class="field-label">Launch month (YYYY-MM)</label>
+          <input type="text" id="fYear" value="2026-05" placeholder="2026-05">
+        </div>
+        <div class="field">
+          <label class="field-label">Region</label>
+          <select id="fRegion">
+            <option>Global</option><option>APAC</option><option>EMEA</option><option>LATAM</option><option>US</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Channel</label>
+          <select id="fChannel">
+            <option value="Ad">Ad</option>
+            <option value="CAMP">Campaign (CAMP)</option>
+            <option value="CONF">Conference (CONF)</option>
+            <option value="CS">Content Syndication (CS)</option>
+            <option value="DG">Digital Gift (DG)</option>
+            <option value="Drip">Drip</option>
+            <option value="Email">Email</option>
+            <option value="Event">PitchBook Event (Event)</option>
+            <option value="NUR">Nurture (NUR)</option>
+            <option value="PG">Physical Gift (PG)</option>
+            <option value="WEB">Website (WEB)</option>
+            <option value="WBNR">Webinar (WBNR)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Sub channel <span style="text-transform:none;font-weight:400;">— optional</span></label>
+          <input type="text" id="fSub" placeholder="e.g. LinkedIn, RollWorks">
+        </div>
+        <div class="field span2">
+          <label class="field-label">Tactic name</label>
+          <input type="text" id="fName" placeholder="e.g. NVCA Venture Monitor">
+          <div class="field-hint">Clear, descriptive title of the tactic. This is the only free-text field — everything else comes from the dropdowns above.</div>
+        </div>
+      </div>
+
+      <div class="preview-box">
+        <div class="preview-label">Campaign name</div>
+        <div class="preview-name" id="preview">—</div>
+        <div class="preview-invalid" id="invalidMsg"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="copyPreview('campaign')">Copy name</button>
+        <button class="btn" onclick="addToHistory('campaign')">Add to list ↓</button>
+        <span class="msg" id="copyMsg-campaign"></span>
+      </div>
+    </div>
+
+    <div class="card ref-card">
+      <details open>
+        <summary>Reference: Channel abbreviations</summary>
+        <table>
+          <tr><th>Channel</th><th>Abbreviation</th></tr>
+          <tr><td>Ad</td><td class="mono">Ad</td></tr>
+          <tr><td>Campaign</td><td class="mono">CAMP</td></tr>
+          <tr><td>Conference</td><td class="mono">CONF</td></tr>
+          <tr><td>Content Syndication</td><td class="mono">CS</td></tr>
+          <tr><td>Digital Gift</td><td class="mono">DG</td></tr>
+          <tr><td>Drip</td><td class="mono">Drip</td></tr>
+          <tr><td>Email</td><td class="mono">Email</td></tr>
+          <tr><td>PitchBook Event</td><td class="mono">Event</td></tr>
+          <tr><td>Nurture</td><td class="mono">NUR</td></tr>
+          <tr><td>Physical Gift</td><td class="mono">PG</td></tr>
+          <tr><td>Website</td><td class="mono">WEB</td></tr>
+          <tr><td>Webinar</td><td class="mono">WBNR</td></tr>
+        </table>
+      </details>
+      <details>
+        <summary>Reference: Worked examples</summary>
+        <table>
+          <tr><th>Scenario</th><th>Name</th></tr>
+          <tr><td>Spring Wave grandparent campaign</td><td class="mono">2026-05: Global-CAMP-Spring Wave</td></tr>
+          <tr><td>Q1 NVCA Venture Monitor webinar</td><td class="mono">2026-04: Global-WBNR-Q1 2026 NVCA Venture Monitor</td></tr>
+          <tr><td>US Top 100 RollWorks ad</td><td class="mono">2026-05: US-Ad-RollWorks-US Top 100</td></tr>
+        </table>
+      </details>
+      <details>
+        <summary>Reminder: Marketo vs. Inflection emails</summary>
+        <table>
+          <tr><td style="border:none;padding-top:2px;">To distinguish Marketo vs. Inflection emails, use the Salesforce Campaign Type field — not the name. Naming stays the same either way.</td></tr>
+        </table>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===================== OPERATIONAL PROGRAM PANEL ===================== -->
+  <div class="panel" id="panel-opProgram">
+    <div class="card op-mode">
+      <div class="grid">
+        <div class="field">
+          <label class="field-label">Function</label>
+          <select id="opFunction">
+            <option value="Scoring">Scoring</option>
+            <option value="Routing & Disqualification">Routing & Disqualification</option>
+            <option value="Webhooks">Webhooks</option>
+            <option value="Data Quality">Data Quality</option>
+            <option value="Lifecycle Management">Lifecycle Management</option>
+            <option value="__custom">Custom — type below</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Custom function name <span style="text-transform:none;font-weight:400;">— if selected above</span></label>
+          <input type="text" id="opFunctionCustom" placeholder="e.g. Consent Management">
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:12px;">
+        Operational programs are evergreen — no launch date, no region. Set the SFDC Program Type to "Default" and Channel to "Operational" when you build the program.
+      </div>
+
+      <div class="preview-box op">
+        <div class="preview-label">Program name</div>
+        <div class="preview-name" id="opProgramPreview">—</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="copyPreview('opProgram')">Copy name</button>
+        <button class="btn" onclick="addToHistory('opProgram')">Add to list ↓</button>
+        <span class="msg" id="copyMsg-opProgram"></span>
+      </div>
+    </div>
+
+    <div class="card ref-card">
+      <details open>
+        <summary>Why no date or region on operational programs</summary>
+        <table>
+          <tr><td style="border:none;padding-top:2px;">Operational programs (scoring, routing, webhooks, data quality) run continuously and don't "launch" the way a campaign does. Adobe's own guidance sets these up as a single program named for the function, with Channel = Operational — separate from the campaign hierarchy entirely, so they're never mistaken for something to archive by date.</td></tr>
+        </table>
+      </details>
+    </div>
+  </div>
+
+  <!-- ===================== OPERATIONAL SMART CAMPAIGN PANEL ===================== -->
+  <div class="panel" id="panel-opCampaign">
+    <div class="card op-mode">
+      <div class="grid3">
+        <div class="field">
+          <label class="field-label">Sequence</label>
+          <input type="text" id="opSeq" value="010" placeholder="010">
+        </div>
+        <div class="field">
+          <label class="field-label">Type</label>
+          <select id="opType">
+            <option value="TRG">Trigger (TRG)</option>
+            <option value="CTRL">Controller / Router (CTRL)</option>
+            <option value="ACT">Action / Executable (ACT)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Description</label>
+          <input type="text" id="opDesc" placeholder="e.g. Form Fill Received">
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:10px;">
+        Number in increments of 10 (010, 020, 030…) so you can insert a new step later (e.g. 015) without renaming everything downstream.
+      </div>
+
+      <div class="preview-box op">
+        <div class="preview-label">Smart campaign name</div>
+        <div class="preview-name" id="opCampaignPreview">—</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="copyPreview('opCampaign')">Copy name</button>
+        <button class="btn" onclick="addToHistory('opCampaign')">Add to list ↓</button>
+        <button class="btn" onclick="bumpSeq()">+10 → next sequence</button>
+        <span class="msg" id="copyMsg-opCampaign"></span>
+      </div>
+    </div>
+
+    <div class="card ref-card">
+      <details open>
+        <summary>Reference: Type abbreviations</summary>
+        <table>
+          <tr><th>Type</th><th>Abbrev.</th><th>Use for</th></tr>
+          <tr><td>Trigger</td><td class="mono">TRG</td><td>Catches the initiating event (form fill, score change, lifecycle stage update)</td></tr>
+          <tr><td>Controller / Router</td><td class="mono">CTRL</td><td>Cascading logic that decides where a lead goes next</td></tr>
+          <tr><td>Action / Executable</td><td class="mono">ACT</td><td>Does the actual work (assign owner, add points, sync field)</td></tr>
+        </table>
+      </details>
+      <details>
+        <summary>Worked example: a routing flow</summary>
+        <table>
+          <tr><th>Name</th><th>What it does</th></tr>
+          <tr><td class="mono">010-TRG-Form Fill Received</td><td>Catches the form submission</td></tr>
+          <tr><td class="mono">020-CTRL-Route by Region</td><td>Cascading logic sends lead down one path</td></tr>
+          <tr><td class="mono">030-ACT-Assign Owner in SFDC</td><td>Executes the assignment</td></tr>
+        </table>
+      </details>
+    </div>
+  </div>
+
+  <div class="card history-card">
+    <h2>Names built this session</h2>
+    <div id="historyList"><div class="history-empty">Nothing added yet — build a name above and click "Add to list."</div></div>
+  </div>
+
+  <div class="footer-note">Built for Marketing Ops · matches the folder structure &amp; SFDC Campaign Hierarchy convention</div>
+</div>
+
+<script>
+function switchTab(mode){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const tabMap = {campaign:0, opProgram:1, opCampaign:2};
+  document.querySelectorAll('.tab')[tabMap[mode]].classList.add('active');
+  document.getElementById('panel-' + mode).classList.add('active');
+}
+
+// ---- Campaign mode ----
+function buildCampaignName(){
+  const year = document.getElementById('fYear').value.trim();
+  const region = document.getElementById('fRegion').value;
+  const channel = document.getElementById('fChannel').value;
+  const sub = document.getElementById('fSub').value.trim();
+  const name = document.getElementById('fName').value.trim();
+
+  const parts = [region, channel];
+  if(sub) parts.push(sub);
+  if(name) parts.push(name);
+
+  const label = parts.join('-');
+  const full = year ? `${year}: ${label}` : label;
+
+  const invalidEl = document.getElementById('invalidMsg');
+  let invalid = '';
+  if(!year || !/^\d{4}-\d{2}$/.test(year)) invalid = 'Launch date should be in YYYY-MM format (e.g. 2026-05).';
+  else if(!name) invalid = 'Add a tactic name to complete the campaign name.';
+  invalidEl.textContent = invalid;
+
+  document.getElementById('preview').textContent = full;
+  return full;
+}
+['fYear','fRegion','fChannel','fSub','fName'].forEach(id => {
+  document.getElementById(id).addEventListener('input', buildCampaignName);
+  document.getElementById(id).addEventListener('change', buildCampaignName);
+});
+
+// ---- Operational Program mode ----
+function buildOpProgramName(){
+  const sel = document.getElementById('opFunction').value;
+  const custom = document.getElementById('opFunctionCustom').value.trim();
+  const fn = sel === '__custom' ? (custom || '…') : sel;
+  const full = `OP-${fn}`;
+  document.getElementById('opProgramPreview').textContent = full;
+  return full;
+}
+['opFunction','opFunctionCustom'].forEach(id => {
+  document.getElementById(id).addEventListener('input', buildOpProgramName);
+  document.getElementById(id).addEventListener('change', buildOpProgramName);
+});
+
+// ---- Operational Smart Campaign mode ----
+function buildOpCampaignName(){
+  const seq = document.getElementById('opSeq').value.trim();
+  const type = document.getElementById('opType').value;
+  const desc = document.getElementById('opDesc').value.trim();
+  const full = `${seq}-${type}-${desc || '…'}`;
+  document.getElementById('opCampaignPreview').textContent = full;
+  return full;
+}
+['opSeq','opType','opDesc'].forEach(id => {
+  document.getElementById(id).addEventListener('input', buildOpCampaignName);
+  document.getElementById(id).addEventListener('change', buildOpCampaignName);
+});
+function bumpSeq(){
+  const seqEl = document.getElementById('opSeq');
+  const n = parseInt(seqEl.value, 10) || 0;
+  const next = n + 10;
+  seqEl.value = String(next).padStart(3, '0');
+  buildOpCampaignName();
+}
+
+// ---- Shared: copy / history ----
+function currentPreview(mode){
+  if(mode === 'campaign') return buildCampaignName();
+  if(mode === 'opProgram') return buildOpProgramName();
+  if(mode === 'opCampaign') return buildOpCampaignName();
+}
+
+function copyPreview(mode){
+  const text = currentPreview(mode);
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copyMsg-' + mode);
+    msg.textContent = 'Copied ✓';
+    setTimeout(() => msg.textContent = '', 1800);
+  });
+}
+
+let history = [];
+function addToHistory(mode){
+  const name = currentPreview(mode);
+  if(!name || name.includes('…')) return;
+  if(mode === 'campaign' && document.getElementById('invalidMsg').textContent) return;
+  const label = mode === 'campaign' ? 'Campaign' : (mode === 'opProgram' ? 'Op Program' : 'Op Flow');
+  history.unshift({name, label, isOp: mode !== 'campaign'});
+  renderHistory();
+}
+function removeHistory(idx){
+  history.splice(idx, 1);
+  renderHistory();
+}
+function copyHistoryItem(idx){
+  navigator.clipboard.writeText(history[idx].name);
+}
+function renderHistory(){
+  const el = document.getElementById('historyList');
+  if(history.length === 0){
+    el.innerHTML = '<div class="history-empty">Nothing added yet — build a name above and click "Add to list."</div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) => `
+    <div class="history-item">
+      <div>
+        <span class="history-badge${h.isOp ? ' op' : ''}">${h.label}</span>
+        <span class="history-name">${h.name.replace(/</g,'&lt;')}</span>
+      </div>
+      <div class="history-actions">
+        <button class="icon-btn" title="Copy" onclick="copyHistoryItem(${i})">⧉</button>
+        <button class="icon-btn" title="Remove" onclick="removeHistory(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+buildCampaignName();
+buildOpProgramName();
+buildOpCampaignName();
+</script>
